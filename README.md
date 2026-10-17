@@ -4,12 +4,12 @@ Sito per compilare la programmazione di forza e pliometrie (pallavolo).
 
 - Login con il solo nome: ognuno ritrova i propri dati scrivendo lo stesso nome.
 - **Giorno 1** – Forza, **Giorno 2** – Pliometrie.
-- Per ogni esercizio, tabella S1–S8 con RIP, PESO e RPE modificabili. Le caselle "/" non si compilano.
+- Per ogni esercizio, tabella S1–S8 con RIP, PESO e RPE. Le ripetizioni già indicate nel programma sono fisse; le caselle "/" non si compilano.
 - Salvataggio automatico.
 
 ## Salvataggio dei dati
 
-- **Senza Firebase** (`firebase-config.js` con `null`): i dati restano nel browser del dispositivo. I pulsanti *Backup* / *Ripristina* servono a spostarli.
+- **Senza Firebase** (`firebase-config.js` con `null`): i dati restano nel browser del dispositivo.
 - **Con Firebase**: i dati vengono salvati su Firestore e si ritrovano da qualsiasi dispositivo. Una copia locale permette di usarlo anche senza rete.
 
 ### Attivare Firebase
