@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Ogni persona ha un documento in "utenti", identificato dal nome.
+    // Accesso libero (il login è solo il nome), ma limitato a questa raccolta
+    // e a documenti con la struttura prevista.
+    match /utenti/{nome} {
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasOnly(['nome', 'dati', 'aggiornato'])
+                   && request.resource.data.nome is string
+                   && request.resource.data.nome.size() <= 60
+                   && request.resource.data.dati is map;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
