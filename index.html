@@ -43,8 +43,6 @@
   .top{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:900px;margin:0 auto}
   .who{font-weight:600}
   .who small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-  .actions{display:flex;gap:6px}
-  .ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 10px;border-radius:8px;font-size:13px}
   .days{display:flex;gap:8px;max-width:900px;margin:10px auto 0}
   .day-btn{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--cell);color:var(--ink);font-size:20px;font-weight:700;text-transform:uppercase}
   .day-btn small{display:block;font-family:Inter,sans-serif;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -67,7 +65,7 @@
   thead th:first-child{position:sticky;left:0;z-index:2}
   td input{width:100%;min-width:52px;border:0;background:var(--cell);color:var(--ink);text-align:center;padding:11px 2px;font-size:15px;font-family:inherit}
   td input:focus{outline:2px solid var(--accent);outline-offset:-2px;background:var(--card)}
-  td input.preset{font-weight:600}
+  td.fixed{font-weight:600;padding:11px 2px;font-size:15px}
   td.na{background:var(--na);color:var(--muted);font-size:13px}
 
   #saved{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ok);color:#fff;padding:7px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none}
@@ -93,12 +91,6 @@
   <header>
     <div class="top">
       <div class="who"><span id="userName"></span><small id="syncInfo">I dati si salvano da soli</small></div>
-      <div class="actions">
-        <button class="ghost" id="exportBtn" title="Scarica un backup dei tuoi dati">Backup</button>
-        <button class="ghost" id="importBtn" title="Carica un backup">Ripristina</button>
-        <button class="ghost" id="logoutBtn">Esci</button>
-        <input type="file" id="importFile" accept="application/json" class="hidden">
-      </div>
     </div>
     <div class="days">
       <button class="day-btn active" data-day="0">Giorno 1<small>Forza</small></button>
@@ -226,14 +218,6 @@ async function login(nome){
   document.getElementById("app").classList.remove("hidden");
   setDay(0);
 }
-function logout(){
-  userId = null;
-  try{ localStorage.removeItem(KEY+".last") }catch(e){}
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
-  document.getElementById("nameInput").value="";
-  renderKnown();
-}
 
 /* ===== SCHEDA ===== */
 function isNA(ex, riga, s){
@@ -261,11 +245,12 @@ function render(){
       h += `<tr><th>${label}</th>`;
       for(let s=0;s<SETTIMANE;s++){
         if(isNA(ex,r,s)){ h += `<td class="na">/</td>`; continue; }
-        const k = cellKey(day,ei,r,s);
         const preset = r==="rip" && ex.rip ? ex.rip[s] : "";
-        const val = k in dati ? dati[k] : preset;
+        if(preset){ h += `<td class="fixed">${preset}</td>`; continue; }
+        const k = cellKey(day,ei,r,s);
+        const val = k in dati ? dati[k] : "";
         const mode = r==="rip" ? "text" : "decimal";
-        h += `<td><input data-k="${k}" class="${preset && val===preset ? "preset":""}" inputmode="${mode}" value="${String(val).replace(/"/g,"&quot;")}" aria-label="${ex.nome} ${label} S${s+1}"></td>`;
+        h += `<td><input data-k="${k}" inputmode="${mode}" value="${String(val).replace(/"/g,"&quot;")}" aria-label="${ex.nome} ${label} S${s+1}"></td>`;
       }
       h += `</tr>`;
     });
@@ -286,36 +271,12 @@ function toast(msg="Salvato"){
 document.getElementById("sheet").addEventListener("input", e=>{
   const k = e.target.dataset.k; if(!k) return;
   userData().dati[k] = e.target.value;
-  e.target.classList.remove("preset");
   saveAll(db);
   if(cloud.ready) pushUser(); else toast();
 });
 
-/* ===== BACKUP ===== */
-document.getElementById("exportBtn").onclick = ()=>{
-  const u = userData();
-  const blob = new Blob([JSON.stringify({nome:u.nome, dati:u.dati}, null, 2)], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `scheda-${userId.replace(/\s/g,"-")}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
-};
-document.getElementById("importBtn").onclick = ()=>document.getElementById("importFile").click();
-document.getElementById("importFile").onchange = async e=>{
-  const f = e.target.files[0]; if(!f) return;
-  try{
-    const j = JSON.parse(await f.text());
-    if(!j.dati) throw 0;
-    if(!confirm(`Sostituire i dati di ${userData().nome} con quelli del backup?`)) return;
-    userData().dati = j.dati; saveAll(db); render();
-    if(cloud.ready) pushUser(); else toast();
-  }catch(_){ alert("File di backup non valido.") }
-  e.target.value="";
-};
-
 /* ===== AVVIO ===== */
 document.getElementById("loginForm").onsubmit = e=>{ e.preventDefault(); login(document.getElementById("nameInput").value) };
-document.getElementById("logoutBtn").onclick = logout;
 document.querySelectorAll(".day-btn").forEach(b=>b.onclick=()=>setDay(+b.dataset.day));
 let last = null; try{ last = localStorage.getItem(KEY+".last") }catch(e){}
 if(last && db.users[last]) login(db.users[last].nome); else renderKnown();
