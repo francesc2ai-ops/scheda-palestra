@@ -24,6 +24,6 @@ La chiave `apiKey` di Firebase non è segreta: è normale che sia nel codice pub
 
 **Attenzione:** il login è solo il nome, quindi chiunque conosca il nome di un'altra persona può aprirne la scheda. Va bene per un gruppo di squadra, non per dati riservati.
 
-## Modificare gli esercizi
+## Schede e esercizi
 
-Il programma si trova nella costante `PROGRAMMA` dentro `index.html`.
+Le schede si trovano nella costante `PROGRAMMI` dentro `index.html`. Ogni scheda compare come bottone nella schermata iniziale. Per aggiungerne una basta copiare un blocco e dargli un `id` e un `prefisso` nuovi (es. `"s3."`), così i suoi dati restano separati. All'accesso il sito riapre l'ultima scheda e l'ultimo giorno usati.
