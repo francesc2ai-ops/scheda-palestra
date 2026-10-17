@@ -23,7 +23,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:15px}
-  h1,h2,.day-btn,.ex-name{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.02em}
+  h1,h2,.day-btn,.ex-name,.prog-btn{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.02em}
   button{font:inherit;cursor:pointer}
   .hidden{display:none!important}
 
@@ -33,28 +33,38 @@
   .login-box h1{margin:0 0 4px;font-size:34px;text-transform:uppercase}
   .login-box p{margin:0 0 20px;color:var(--muted)}
   .login-box input{width:100%;padding:14px;font-size:17px;border:1px solid var(--line);border-radius:10px;background:var(--cell);color:var(--ink)}
-  .login-box button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:16px}
-  .known{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px}
-  .known span{font-size:13px;color:var(--muted);width:100%}
-  .chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--cell);color:var(--ink);font-size:14px}
+  .login-box button[type=submit]{width:100%;margin-top:12px;padding:14px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:16px}
+  .known{margin-top:18px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .known-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;background:var(--cell);border-bottom:1px solid var(--line)}
+  .known-name{display:flex;justify-content:space-between;align-items:center;width:100%;padding:13px 14px;border:0;border-bottom:1px solid var(--line);background:var(--card);color:var(--ink);font-size:16px;text-align:left}
+  .known-name:last-child{border-bottom:0}
+  .known-name::after{content:"›";color:var(--muted);font-size:20px;line-height:1}
+  .known-name:active{background:var(--cell)}
 
-  /* APP */
-  header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px calc(10px);padding-top:max(10px,env(safe-area-inset-top))}
+  /* HEADER */
+  header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
   .top{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:900px;margin:0 auto}
-  .who{font-weight:600}
+  .who{font-weight:600;min-width:0}
   .who small{display:block;font-weight:400;color:var(--muted);font-size:12px}
-  .days{display:flex;gap:8px;max-width:900px;margin:10px auto 0}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;font-size:13px;white-space:nowrap}
+  .back{border:0;background:transparent;color:var(--accent);font-size:14px;font-weight:600;padding:6px 0;margin:8px auto 0;display:block;max-width:900px;width:100%;text-align:left}
+  .days{display:flex;gap:8px;max-width:900px;margin:6px auto 0}
   .day-btn{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--cell);color:var(--ink);font-size:20px;font-weight:700;text-transform:uppercase}
   .day-btn small{display:block;font-family:Inter,sans-serif;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .day-btn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
   .day-btn.active small{color:var(--accent-ink);opacity:.8}
 
+  /* SCHEDE */
   main{max-width:900px;margin:0 auto;padding:16px 16px 60px}
+  .home-title{font-family:"Barlow Condensed",Inter,sans-serif;font-size:26px;text-transform:uppercase;margin:6px 0 14px}
+  .progs{display:grid;gap:12px}
+  .prog-btn{display:block;width:100%;text-align:left;padding:22px 20px;border-radius:14px;border:0;background:var(--accent);color:var(--accent-ink);font-size:30px;font-weight:700;text-transform:uppercase}
+  .prog-btn small{display:block;font-family:Inter,sans-serif;font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;opacity:.85;margin-top:4px}
+
   .ex{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
   .ex-head{padding:12px 14px 10px;border-bottom:1px solid var(--line)}
   .ex-name{font-size:22px;font-weight:700;text-transform:uppercase;margin:0;line-height:1.1}
   .ex-note{margin-top:4px;font-size:13px;color:var(--muted)}
-  .ex-note b{color:var(--ink);font-weight:600}
   .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
   table{border-collapse:collapse;width:100%;min-width:560px}
   th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;padding:0}
@@ -80,10 +90,10 @@
     <h1>Scheda Palestra</h1>
     <p>Scrivi il tuo nome per aprire la tua scheda.</p>
     <form id="loginForm">
-      <input id="nameInput" type="text" placeholder="Il tuo nome" autocomplete="given-name" autocapitalize="words" required>
+      <input id="nameInput" type="text" placeholder="Il tuo nome" autocomplete="off" autocapitalize="words" required>
       <button type="submit">Entra</button>
     </form>
-    <div class="known" id="known"></div>
+    <div class="known hidden" id="known"></div>
   </div>
 </section>
 
@@ -91,46 +101,57 @@
   <header>
     <div class="top">
       <div class="who"><span id="userName"></span><small id="syncInfo">I dati si salvano da soli</small></div>
+      <button class="ghost" id="logoutBtn">Esci</button>
     </div>
-    <div class="days">
-      <button class="day-btn active" data-day="0">Giorno 1<small>Forza</small></button>
-      <button class="day-btn" data-day="1">Giorno 2<small>Pliometrie</small></button>
+    <div id="sheetNav" class="hidden">
+      <button class="back" id="backBtn">‹ Tutte le schede</button>
+      <div class="days" id="days"></div>
     </div>
   </header>
-  <main id="sheet"></main>
+  <main id="home" class="hidden">
+    <h2 class="home-title">Le tue schede</h2>
+    <div class="progs" id="progs"></div>
+  </main>
+  <main id="sheet" class="hidden"></main>
 </section>
 
 <div id="saved">Salvato</div>
 
 <script src="firebase-config.js"></script>
 <script>
-/* ===== PROGRAMMA (dai PDF) =====
-   rip: valori prestampati per S1..S8 (null = da compilare)
-   noPeso / noRpe: indici delle settimane con "/" (true = tutte) */
+/* ===== SCHEDE =====
+   Per aggiungere una scheda: copia un blocco di PROGRAMMI e cambia id, titolo e
+   prefisso (il prefisso tiene separati i dati di ogni scheda; non cambiarlo dopo).
+   rip: ripetizioni prestampate per S1..S8 (fisse)
+   noPeso / noRpe: settimane con "/" (ALL = tutte, oppure indici 0..7) */
 const ALL = true;
 const R = s => s.split(' ');
-const PROGRAMMA = [
-  { nome: "Giorno 1", esercizi: [
-    { nome:"Squat esplosivi", note:"Seguo schema di lavoro (negativa lenta, salita forte)", rip:R("3X4 3X4 3X5 3X5 3X6 3X6 3X6 3X6") },
-    { nome:"RDL / Leg curl", note:"3 serie da 8 ripetizioni" },
-    { nome:"Hip trust monopodalico", note:"3 serie da 6 ripetizioni x gamba" },
-    { nome:"Chin up + push up", note:"3 serie da 8 + 8 ripetizioni", noPeso:ALL, noRpe:ALL },
-    { nome:"Push up su rialzi alternato", note:"Seguo schema di lavoro", rip:R("2X8 2X10 3X8 3X8 3X10 3X10 3X12 3X12"), noPeso:ALL, noRpe:ALL },
-    { nome:"Alzate laterali", note:"3 serie da 10 ripetizioni + 5'' isometria finale" },
-    { nome:"Calf raise monopodalici", note:"2 serie da 10 ripetizioni x gamba" },
-  ]},
-  { nome: "Giorno 2", esercizi: [
-    { nome:"Seated box jump", note:"Seguire schema di lavoro (altezza box 60)", rip:R("3x3 3x3 3x4 3x4 3x3 3x3 3x5 3x5"), noPeso:[4,5,6,7], noRpe:[4,5,6,7] },
-    { nome:"Trap bar + jump", note:"Seguo schema di lavoro (negativa lenta con peso)", rip:R("3x3 3x3 3x4 3x4 3x5 3x5 3x6 3x6") },
-    { nome:"Lateral bound + step jump", note:"Seguo schema di lavoro", rip:R("3x5 3x5 3x6 3x6 4x3 4x3 4x4 4x4"), noPeso:ALL, noRpe:ALL },
-    { nome:"Knee jump + vertical", note:"Seguo schema di lavoro", rip:R("3x2 3x2 3x3 3x3 2x4 2x3 2x2 3x2"), noPeso:ALL, noRpe:ALL },
-    { nome:"Bulgarian jump + step", note:"Seguo schema di lavoro", rip:R("3x5 3x5 3x6 3x6 4x3 4x3 4x4 4x4"), noPeso:ALL, noRpe:ALL },
-    { nome:"Landmine OH press", note:"3 serie da 5 ripetizioni x lato (esecuzione in ginocchio)" },
-    { nome:"Kneeling trunk rotation", note:"3 serie da 4 ripetizioni x lato" },
-  ]},
+const PROGRAMMI = [
+  { id:"schede2", titolo:"Schede 2", sottotitolo:"Giorno 1 Forza · Giorno 2 Pliometrie", prefisso:"",
+    giorni: [
+      { nome:"Giorno 1", sotto:"Forza", esercizi: [
+        { nome:"Squat esplosivi", note:"Seguo schema di lavoro (negativa lenta, salita forte)", rip:R("3X4 3X4 3X5 3X5 3X6 3X6 3X6 3X6") },
+        { nome:"RDL / Leg curl", note:"3 serie da 8 ripetizioni" },
+        { nome:"Hip trust monopodalico", note:"3 serie da 6 ripetizioni x gamba" },
+        { nome:"Chin up + push up", note:"3 serie da 8 + 8 ripetizioni", noPeso:ALL, noRpe:ALL },
+        { nome:"Push up su rialzi alternato", note:"Seguo schema di lavoro", rip:R("2X8 2X10 3X8 3X8 3X10 3X10 3X12 3X12"), noPeso:ALL, noRpe:ALL },
+        { nome:"Alzate laterali", note:"3 serie da 10 ripetizioni + 5'' isometria finale" },
+        { nome:"Calf raise monopodalici", note:"2 serie da 10 ripetizioni x gamba" },
+      ]},
+      { nome:"Giorno 2", sotto:"Pliometrie", esercizi: [
+        { nome:"Seated box jump", note:"Seguire schema di lavoro (altezza box 60)", rip:R("3x3 3x3 3x4 3x4 3x3 3x3 3x5 3x5"), noPeso:[4,5,6,7], noRpe:[4,5,6,7] },
+        { nome:"Trap bar + jump", note:"Seguo schema di lavoro (negativa lenta con peso)", rip:R("3x3 3x3 3x4 3x4 3x5 3x5 3x6 3x6") },
+        { nome:"Lateral bound + step jump", note:"Seguo schema di lavoro", rip:R("3x5 3x5 3x6 3x6 4x3 4x3 4x4 4x4"), noPeso:ALL, noRpe:ALL },
+        { nome:"Knee jump + vertical", note:"Seguo schema di lavoro", rip:R("3x2 3x2 3x3 3x3 2x4 2x3 2x2 3x2"), noPeso:ALL, noRpe:ALL },
+        { nome:"Bulgarian jump + step", note:"Seguo schema di lavoro", rip:R("3x5 3x5 3x6 3x6 4x3 4x3 4x4 4x4"), noPeso:ALL, noRpe:ALL },
+        { nome:"Landmine OH press", note:"3 serie da 5 ripetizioni x lato (esecuzione in ginocchio)" },
+        { nome:"Kneeling trunk rotation", note:"3 serie da 4 ripetizioni x lato" },
+      ]},
+    ]},
 ];
 const SETTIMANE = 8;
 const RIGHE = [["rip","RIP"],["peso","PESO"],["rpe","RPE"]];
+const ULTIMA = "_ultima";   // chiave in "dati" con l'ultima scheda/giorno aperti
 
 /* ===== STORAGE =====
    Copia locale sempre attiva (funziona anche senza rete).
@@ -141,7 +162,7 @@ function loadAll(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {users:
 function saveAll(db){ try{ localStorage.setItem(KEY, JSON.stringify(db)); return true }catch(e){ return false } }
 const idOf = n => n.trim().toLowerCase().replace(/\s+/g," ");
 
-let db = loadAll(), userId = null, day = 0;
+let db = loadAll(), userId = null, prog = null, day = 0;
 
 const cloud = { ready:null, fs:null, api:null };
 if (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.projectId) {
@@ -170,7 +191,7 @@ async function pullUser(id){
   }catch(e){ console.warn("Lettura online fallita", e); }
 }
 let pushTimer;
-function pushUser(){
+function pushUser(silent){
   if(!cloud.ready) return;
   clearTimeout(pushTimer);
   const id = userId, u = userData();
@@ -178,8 +199,8 @@ function pushUser(){
     if(!(await cloud.ready)) return;
     try{
       await cloud.api.setDoc(docRef(id), { nome:u.nome, dati:u.dati, aggiornato: cloud.api.serverTimestamp() }, { merge:true });
-      toast("Salvato online");
-    }catch(e){ console.warn("Salvataggio online fallito", e); toast("Salvato sul telefono"); }
+      if(!silent) toast("Salvato online");
+    }catch(e){ console.warn("Salvataggio online fallito", e); if(!silent) toast("Salvato sul telefono"); }
   }, 700);
 }
 
@@ -187,16 +208,30 @@ function userData(){
   if(!db.users[userId]) db.users[userId] = { nome:"", dati:{} };
   return db.users[userId];
 }
-const cellKey = (d,e,r,s) => `${d}.${e}.${r}.${s}`;
+const cellKey = (d,e,r,s) => `${prog.prefisso}${d}.${e}.${r}.${s}`;
+
+/* ===== SCHERMATE ===== */
+function show(screen){
+  document.getElementById("login").classList.toggle("hidden", screen!=="login");
+  document.getElementById("app").classList.toggle("hidden", screen==="login");
+  document.getElementById("home").classList.toggle("hidden", screen!=="home");
+  document.getElementById("sheet").classList.toggle("hidden", screen!=="sheet");
+  document.getElementById("sheetNav").classList.toggle("hidden", screen!=="sheet");
+  window.scrollTo({top:0});
+}
 
 /* ===== LOGIN ===== */
 function renderKnown(){
   const box = document.getElementById("known");
-  const names = Object.values(db.users).map(u=>u.nome).filter(Boolean);
-  box.innerHTML = names.length ? "<span>Su questo dispositivo:</span>" : "";
+  const names = Object.values(db.users).map(u=>u.nome).filter(Boolean)
+    .sort((a,b)=>a.localeCompare(b,"it"));
+  box.innerHTML = "";
+  box.classList.toggle("hidden", !names.length);
+  if(!names.length) return;
+  box.insertAdjacentHTML("beforeend", `<div class="known-title">Nomi già usati</div>`);
   names.forEach(n=>{
     const b = document.createElement("button");
-    b.className="chip"; b.type="button"; b.textContent=n;
+    b.className="known-name"; b.type="button"; b.textContent=n;
     b.onclick=()=>login(n);
     box.appendChild(b);
   });
@@ -214,12 +249,48 @@ async function login(nome){
   try{ localStorage.setItem(KEY+".last", userId) }catch(e){}
   document.getElementById("userName").textContent = u.nome;
   document.getElementById("syncInfo").textContent = cloud.ready ? "Dati salvati online" : "Dati salvati su questo dispositivo";
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  setDay(0);
+  // riapre l'ultima scheda e l'ultimo giorno usati
+  const [pid, d] = String(u.dati[ULTIMA]||"").split(":");
+  const p = PROGRAMMI.find(x=>x.id===pid);
+  if(p) openProg(p, +d||0); else showHome();
+}
+function logout(){
+  userId = null; prog = null;
+  try{ localStorage.removeItem(KEY+".last") }catch(e){}
+  document.getElementById("nameInput").value = "";
+  renderKnown();
+  show("login");
+}
+
+/* ===== HOME ===== */
+function showHome(){
+  const box = document.getElementById("progs");
+  box.innerHTML = "";
+  PROGRAMMI.forEach(p=>{
+    const b = document.createElement("button");
+    b.className = "prog-btn";
+    b.innerHTML = `${p.titolo}<small>${p.sottotitolo}</small>`;
+    b.onclick = ()=>openProg(p, 0);
+    box.appendChild(b);
+  });
+  show("home");
 }
 
 /* ===== SCHEDA ===== */
+function openProg(p, d){
+  prog = p;
+  const days = document.getElementById("days");
+  days.innerHTML = "";
+  p.giorni.forEach((g,i)=>{
+    const b = document.createElement("button");
+    b.className = "day-btn"; b.dataset.day = i;
+    b.innerHTML = `${g.nome}<small>${g.sotto||""}</small>`;
+    b.onclick = ()=>setDay(i);
+    days.appendChild(b);
+  });
+  show("sheet");
+  setDay(Math.min(d, p.giorni.length-1));
+}
 function isNA(ex, riga, s){
   const v = riga==="peso" ? ex.noPeso : riga==="rpe" ? ex.noRpe : null;
   return v===true || (Array.isArray(v) && v.includes(s));
@@ -227,6 +298,8 @@ function isNA(ex, riga, s){
 function setDay(d){
   day = d;
   document.querySelectorAll(".day-btn").forEach(b=>b.classList.toggle("active", +b.dataset.day===d));
+  const u = userData(), pos = `${prog.id}:${d}`;
+  if(u.dati[ULTIMA] !== pos){ u.dati[ULTIMA] = pos; saveAll(db); pushUser(true); }
   render();
   window.scrollTo({top:0});
 }
@@ -234,7 +307,7 @@ function render(){
   const dati = userData().dati;
   const main = document.getElementById("sheet");
   main.innerHTML = "";
-  PROGRAMMA[day].esercizi.forEach((ex, ei)=>{
+  prog.giorni[day].esercizi.forEach((ex, ei)=>{
     const card = document.createElement("article");
     card.className = "ex";
     let h = `<div class="ex-head"><h2 class="ex-name">${ex.nome}</h2><div class="ex-note">${ex.note}</div></div>`;
@@ -277,9 +350,10 @@ document.getElementById("sheet").addEventListener("input", e=>{
 
 /* ===== AVVIO ===== */
 document.getElementById("loginForm").onsubmit = e=>{ e.preventDefault(); login(document.getElementById("nameInput").value) };
-document.querySelectorAll(".day-btn").forEach(b=>b.onclick=()=>setDay(+b.dataset.day));
+document.getElementById("logoutBtn").onclick = logout;
+document.getElementById("backBtn").onclick = showHome;
 let last = null; try{ last = localStorage.getItem(KEY+".last") }catch(e){}
-if(last && db.users[last]) login(db.users[last].nome); else renderKnown();
+if(last && db.users[last]) login(db.users[last].nome); else { renderKnown(); show("login"); }
 </script>
 </body>
 </html>
