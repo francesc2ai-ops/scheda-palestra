@@ -44,8 +44,9 @@
   /* HEADER */
   header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top))}
   .top{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:900px;margin:0 auto}
-  .who{font-weight:600;min-width:0}
-  .who small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+  .who{min-width:0}
+  #hello{display:block;font-family:"Barlow Condensed",Inter,sans-serif;font-size:22px;font-weight:700;line-height:1.1}
+  #motto{display:block;color:var(--accent);font-size:13px;font-weight:500;margin-top:2px}
   .ghost{background:transparent;border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;font-size:13px;white-space:nowrap}
   .back{border:0;background:transparent;color:var(--accent);font-size:14px;font-weight:600;padding:6px 0;margin:8px auto 0;display:block;max-width:900px;width:100%;text-align:left}
   .days{display:flex;gap:8px;max-width:900px;margin:6px auto 0}
@@ -100,7 +101,7 @@
 <section id="app" class="hidden">
   <header>
     <div class="top">
-      <div class="who"><span id="userName"></span><small id="syncInfo">I dati si salvano da soli</small></div>
+      <div class="who"><span id="hello"></span><small id="motto"></small></div>
       <button class="ghost" id="logoutBtn">Esci</button>
     </div>
     <div id="sheetNav" class="hidden">
@@ -152,6 +153,20 @@ const PROGRAMMI = [
 const SETTIMANE = 8;
 const RIGHE = [["rip","RIP"],["peso","PESO"],["rpe","RPE"]];
 const ULTIMA = "_ultima";   // chiave in "dati" con l'ultima scheda/giorno aperti
+const FRASI = [
+  "Buon allenamento!",
+  "Oggi si salta più in alto 🏐",
+  "Ogni serie conta.",
+  "Testa, cuore e gambe!",
+  "Una rep alla volta.",
+  "La costanza batte il talento.",
+  "Spingi forte, atterra morbido.",
+  "Allenati come giochi, gioca come ti alleni.",
+  "Muro alto, testa alta!",
+  "Piccoli progressi, grandi risultati.",
+  "Oggi meglio di ieri.",
+  "Forza, si vola! 💪",
+];
 
 /* ===== STORAGE =====
    Copia locale sempre attiva (funziona anche senza rete).
@@ -170,7 +185,7 @@ if (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.projectId) {
   cloud.ready = Promise.all([import(V+"firebase-app.js"), import(V+"firebase-firestore.js")])
     .then(([app, fs])=>{
       const a = app.initializeApp(window.FIREBASE_CONFIG);
-      try { cloud.fs = fs.initializeFirestore(a, { localCache: fs.persistentLocalCache() }); }
+      try { cloud.fs = fs.initializeFirestore(a, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }); }
       catch(e){ cloud.fs = fs.getFirestore(a); }
       cloud.api = fs; return true;
     })
@@ -178,16 +193,29 @@ if (window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.projectId) {
 }
 const docRef = id => cloud.api.doc(cloud.fs, "utenti", id.replace(/\//g,"_"));
 
+// Non blocca mai l'accesso: se la rete è lenta entra con i dati del telefono
+// e aggiorna la scheda quando arrivano quelli online.
+const ATTESA_MAX = 3000;
+const entro = (p, ms) => Promise.race([p, new Promise(r=>setTimeout(()=>r("timeout"), ms))]);
+function mergeRemote(id, snap, localeVince){
+  if(!snap || !snap.exists()) return false;
+  const r = snap.data();
+  const u = db.users[id] || (db.users[id] = {nome:r.nome||id, dati:{}});
+  u.dati = localeVince ? Object.assign({}, r.dati||{}, u.dati) : Object.assign({}, u.dati, r.dati||{});
+  saveAll(db);
+  return true;
+}
 async function pullUser(id){
-  if(!cloud.ready || !(await cloud.ready)) return;
+  if(!cloud.ready) return;
   try{
-    const snap = await cloud.api.getDoc(docRef(id));
-    if(snap.exists()){
-      const r = snap.data();
-      const u = db.users[id] || (db.users[id] = {nome:r.nome||id, dati:{}});
-      u.dati = Object.assign({}, u.dati, r.dati||{});
-      saveAll(db);
-    }
+    const ok = await entro(cloud.ready, ATTESA_MAX);
+    if(ok !== true) return;
+    const p = cloud.api.getDoc(docRef(id));
+    const snap = await entro(p, ATTESA_MAX);
+    if(snap !== "timeout"){ mergeRemote(id, snap); return; }
+    // arrivano dopo: aggiorna la scheda se l'utente è ancora lo stesso
+    // (i valori scritti nel frattempo sul telefono hanno la precedenza)
+    p.then(s=>{ if(mergeRemote(id, s, true) && userId===id && prog) render(); }).catch(()=>{});
   }catch(e){ console.warn("Lettura online fallita", e); }
 }
 let pushTimer;
@@ -247,8 +275,8 @@ async function login(nome){
   const u = userData(); if(!u.nome) u.nome = nome;
   saveAll(db);
   try{ localStorage.setItem(KEY+".last", userId) }catch(e){}
-  document.getElementById("userName").textContent = u.nome;
-  document.getElementById("syncInfo").textContent = cloud.ready ? "Dati salvati online" : "Dati salvati su questo dispositivo";
+  document.getElementById("hello").textContent = `Ciao ${u.nome}!`;
+  document.getElementById("motto").textContent = FRASI[Math.floor(Math.random()*FRASI.length)];
   // riapre l'ultima scheda e l'ultimo giorno usati
   const [pid, d] = String(u.dati[ULTIMA]||"").split(":");
   const p = PROGRAMMI.find(x=>x.id===pid);
@@ -345,7 +373,8 @@ document.getElementById("sheet").addEventListener("input", e=>{
   const k = e.target.dataset.k; if(!k) return;
   userData().dati[k] = e.target.value;
   saveAll(db);
-  if(cloud.ready) pushUser(); else toast();
+  toast();
+  if(cloud.ready) pushUser();
 });
 
 /* ===== AVVIO ===== */
